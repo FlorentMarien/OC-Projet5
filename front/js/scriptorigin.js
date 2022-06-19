@@ -93,17 +93,18 @@ getProductById(getIdProductPage()).then((result) => {
     //test for localstorage 
     let test;
     for (var i = 0; i < localStorage.length; i++) {
-        test=localStorage.getItem(i);
-        
-        test=JSON.parse(test);
+        test=JSON.parse(localStorage.getItem(i));
         if((test.id==id) && (test.color==color)){
+            console.log("Element déjà ajouté, ajout de la quantité");
             verif++;
             pos=i;
             i=localStorage.length+1;
         }
+        
     }
     if(verif==0){
         localStorage.setItem(localStorage.length,JSON.stringify(product));
+        console.log("L'article n'a pas été trouvé dans la panier, ajout");
     }   
     else{
         product=localStorage.getItem(pos);
@@ -148,7 +149,7 @@ function addProductCart(id, product,i){
                   "<input type=\"number\" class=\"itemQuantity\" name=\"itemQuantity\" min=\"1\" max=\"100\" onchange=\"onchangeProductCart("+i+")\" value=\""+product.quantity+"\">"+
                 "</div>"+
                 "<div class=\"cart__item__content__settings__delete\">"+
-                  "<p class=\"deleteItem\">Supprimer</p>"+
+                  "<p class=\"deleteItem\" onclick=\"deleteProductCart("+i+")\">Supprimer</p>"+
                 "</div>"+
             "</div>"+
             "</div>"+
@@ -172,4 +173,46 @@ function onchangeProductCart(i){
     localStorage.setItem(i,JSON.stringify(product));
     //Modifie le paragraphe associé
     document.getElementsByClassName("cart__item__content__settings__quantity")[i].firstChild.innerHTML="Qté : "+document.getElementsByClassName("itemQuantity")[i].value;
+}
+function deleteProductCart(y){
+    //Dernier element du tableau Y+1 pour le 0
+    
+    if(localStorage.length==y+1){
+        console.log("Problème dernière ligne:"+y+" / Supression")
+        localStorage.removeItem(y);
+    }
+    else{
+        let product;
+        let message;
+        console.log("Probleme ligne: "+y);
+        for (i=y;i<localStorage.length;i++){
+            
+            if(localStorage.getItem(i+1)!=null ){
+                message=i+1;
+                console.log("Modification de la ligne: "+i+" avec la ligne: "+message);
+                product = JSON.parse(localStorage.getItem(i+1));
+                localStorage.setItem(i,JSON.stringify(product));
+            }
+            else{
+                localStorage.removeItem(i);
+                console.log("Suppression ligne "+i);
+                i=localStorage.length+1;
+            }
+            
+        }
+    }
+    document.getElementsByClassName("cart__item ")[y].remove();
+    refreshPanier();
+    /*
+    document.getElementsByClassName("cart__item__content__settings__quantity")[0].lastChild.attributes["onchange"]="onchangeProductCart("+i+")";
+    document.getElementsByClassName("deleteItem").attributes["onclick"]="deleteProductCart("+i+")";
+    */
+}
+function refreshPanier(){
+    //Modification de la valeur Onchange et Onclick
+    for (i=0;i<localStorage.length;i++){
+        console.log("Refresh ligne:"+i);
+        document.getElementsByClassName("cart__item__content__settings__quantity")[i].lastChild.attributes["onchange"].value="onchangeProductCart("+i+")";
+        document.getElementsByClassName("deleteItem")[i].attributes["onclick"].value="deleteProductCart("+i+")";
+    }
 }
