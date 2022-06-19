@@ -39,12 +39,14 @@ function getProductById(id){
     }
     })
     .then(function(result) {
+        
         return result;
     })
     .catch(function(err) {
     // Une erreur est survenue
     });
 }
+
 function changeProduct(){
     getProductById(getIdProductPage()).then((result) => {                     
         //Ajout de l'image
@@ -122,10 +124,13 @@ function clickaddToCart(){
 // Cart
 function getCart(){
     let product;
-    
     for (i=0 ; i<localStorage.length ;i++){
         product=JSON.parse(localStorage.getItem(i));
-        getProductById(product.id).then((apiproduct) => {
+        addProductCart(product.id,product);
+    }
+}
+function addProductCart(id, product){
+    getProductById(id).then((apiproduct) => {
         document.getElementById("cart__items").innerHTML+=
         "<article class=\"cart__item\" data-id=\""+product.id+"\" data-color=\""+product.color+"\">"+
             "<div class=\"cart__item__img\">"+
@@ -148,6 +153,8 @@ function getCart(){
             "</div>"+
             "</div>"+
         "</article>";
-        });
-    }
+    }); 
+}
+function onchangeProductCart(id){
+    
 }
