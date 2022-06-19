@@ -1,6 +1,6 @@
 //Index
-function getElements(){
-    fetch("http://localhost:3000/api/products")
+async function getElements(){
+    await fetch("http://localhost:3000/api/products")
       .then(function(res) {
         if (res.ok) {
           return res.json();
@@ -31,8 +31,8 @@ function getIdProductPage(){
     tampon2=id.slice(4);
     return tampon2;
 }
-function getProductById(id){
-    return fetch("http://localhost:3000/api/products/"+id)
+async function getProductById(id){
+    return await fetch("http://localhost:3000/api/products/"+id)
     .then(function(res) {
     if (res.ok) {
         return res.json();
@@ -84,7 +84,6 @@ localStorage.setItem('maVoiture', JSON.stringify(voiture));
 */
 // ID COULEUR QUANTITE
 getProductById(getIdProductPage()).then((result) => {
-    console.log(result);
     let id=result._id;
     let color=document.getElementById("colors").value;
     let quantity=document.getElementById("quantity").value;
@@ -107,7 +106,6 @@ getProductById(getIdProductPage()).then((result) => {
         localStorage.setItem(localStorage.length,JSON.stringify(product));
     }   
     else{
-        console.log("test:"+localStorage.getItem(pos)+" / Pos:"+pos);
         product=localStorage.getItem(pos);
         product=JSON.parse(product);
         let x=parseInt(product.quantity,10);
@@ -124,12 +122,14 @@ function clickaddToCart(){
 // Cart
 function getCart(){
     let product;
+    
     for (i=0 ; i<localStorage.length ;i++){
         product=JSON.parse(localStorage.getItem(i));
-        addProductCart(product.id,product);
+        addProductCart(product.id,product,i);
     }
+    
 }
-function addProductCart(id, product){
+function addProductCart(id, product,i){
     getProductById(id).then((apiproduct) => {
         document.getElementById("cart__items").innerHTML+=
         "<article class=\"cart__item\" data-id=\""+product.id+"\" data-color=\""+product.color+"\">"+
@@ -145,7 +145,7 @@ function addProductCart(id, product){
             "<div class=\"cart__item__content__settings\">"+
                 "<div class=\"cart__item__content__settings__quantity\">"+
                     "<p>Qté : "+product.quantity+"</p>"+
-                  "<input type=\"number\" class=\"itemQuantity\" name=\"itemQuantity\" min=\"1\" max=\"100\" value=\""+product.quantity+"\">"+
+                  "<input type=\"number\" class=\"itemQuantity\" name=\"itemQuantity\" min=\"1\" max=\"100\" onchange=\"onchangeProductCart("+i+")\" value=\""+product.quantity+"\">"+
                 "</div>"+
                 "<div class=\"cart__item__content__settings__delete\">"+
                   "<p class=\"deleteItem\">Supprimer</p>"+
@@ -153,8 +153,23 @@ function addProductCart(id, product){
             "</div>"+
             "</div>"+
         "</article>";
+        
     }); 
 }
-function onchangeProductCart(id){
-    
+/*function addonchangeProductCart(){
+    const collection = document.getElementsByClassName("itemQuantity");
+    console.log(collection[1]);
+    for (let i = 0; i < collection.length; i++) {
+        collection[i].addEventListener("onchange",onchangeProductCart(i));
+    }
+}*/
+function onchangeProductCart(i){
+    //Recuperation de l'item du stockage
+    let product = JSON.parse(localStorage.getItem(i));
+    //Modification de la valeur quantité avec celle du selecteur
+    product.quantity=document.getElementsByClassName("itemQuantity")[i].value;
+    //Ajout avec modification
+    localStorage.setItem(i,JSON.stringify(product));
+    //Modifie le paragraphe associé
+    document.getElementsByClassName("cart__item__content__settings__quantity")[i].firstChild.innerHTML="Qté : "+document.getElementsByClassName("itemQuantity")[i].value;
 }
