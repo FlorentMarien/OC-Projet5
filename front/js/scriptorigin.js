@@ -126,7 +126,7 @@ function getCart(){
     for (i=0 ; i<localStorage.length ;i++){
         product=JSON.parse(localStorage.getItem(i));
         getProductById(product.id).then((apiproduct) => {
-        document.getElementById("cart__items").innerHTML=
+        document.getElementById("cart__items").innerHTML+=
         "<article class=\"cart__item\" data-id=\""+product.id+"\" data-color=\""+product.color+"\">"+
             "<div class=\"cart__item__img\">"+
                 "<img src=\""+apiproduct.imageUrl+"\" alt=\""+apiproduct.altTxt+"\">"+
