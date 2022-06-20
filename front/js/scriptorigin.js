@@ -121,49 +121,39 @@ function clickaddToCart(){
 }
 //
 // Cart
-function getCart(){
+async function getCart(){
     let product;
-    
+    // addProductCart(product.id,product,i);
     for (i=0 ; i<localStorage.length ;i++){
         product=JSON.parse(localStorage.getItem(i));
-        addProductCart(product.id,product,i);
+        await getProductById(product.id).then((apiproduct) => {
+            document.getElementById("cart__items").innerHTML+=
+            "<article class=\"cart__item\" data-id=\""+product.id+"\" data-color=\""+product.color+"\">"+
+                "<div class=\"cart__item__img\">"+
+                    "<img src=\""+apiproduct.imageUrl+"\" alt=\""+apiproduct.altTxt+"\">"+
+                "</div>"+
+                "<div class=\"cart__item__content\">"+
+                    "<div class=\"cart__item__content__description\">"+
+                    "<h2>"+apiproduct.name+"</h2>"+
+                    "<p>"+product.color+"</p>"+
+                    "<p>"+apiproduct.price+" €</p>"+
+                "</div>"+
+                "<div class=\"cart__item__content__settings\">"+
+                    "<div class=\"cart__item__content__settings__quantity\">"+
+                        "<p>Qté : "+product.quantity+"</p>"+
+                      "<input type=\"number\" class=\"itemQuantity\" name=\"itemQuantity\" min=\"1\" max=\"100\" onchange=\"onchangeProductCart("+i+")\" value=\""+product.quantity+"\">"+
+                    "</div>"+
+                    "<div class=\"cart__item__content__settings__delete\">"+
+                      "<p class=\"deleteItem\" onclick=\"deleteProductCart("+i+")\">Supprimer</p>"+
+                    "</div>"+
+                "</div>"+
+                "</div>"+
+            "</article>";
+        });
     }
+    refreshPanier();
     
 }
-function addProductCart(id, product,i){
-    getProductById(id).then((apiproduct) => {
-        document.getElementById("cart__items").innerHTML+=
-        "<article class=\"cart__item\" data-id=\""+product.id+"\" data-color=\""+product.color+"\">"+
-            "<div class=\"cart__item__img\">"+
-                "<img src=\""+apiproduct.imageUrl+"\" alt=\""+apiproduct.altTxt+"\">"+
-            "</div>"+
-            "<div class=\"cart__item__content\">"+
-                "<div class=\"cart__item__content__description\">"+
-                "<h2>"+apiproduct.name+"</h2>"+
-                "<p>"+product.color+"</p>"+
-                "<p>"+apiproduct.price+" €</p>"+
-            "</div>"+
-            "<div class=\"cart__item__content__settings\">"+
-                "<div class=\"cart__item__content__settings__quantity\">"+
-                    "<p>Qté : "+product.quantity+"</p>"+
-                  "<input type=\"number\" class=\"itemQuantity\" name=\"itemQuantity\" min=\"1\" max=\"100\" onchange=\"onchangeProductCart("+i+")\" value=\""+product.quantity+"\">"+
-                "</div>"+
-                "<div class=\"cart__item__content__settings__delete\">"+
-                  "<p class=\"deleteItem\" onclick=\"deleteProductCart("+i+")\">Supprimer</p>"+
-                "</div>"+
-            "</div>"+
-            "</div>"+
-        "</article>";
-        
-    }); 
-}
-/*function addonchangeProductCart(){
-    const collection = document.getElementsByClassName("itemQuantity");
-    console.log(collection[1]);
-    for (let i = 0; i < collection.length; i++) {
-        collection[i].addEventListener("onchange",onchangeProductCart(i));
-    }
-}*/
 function onchangeProductCart(i){
     //Recuperation de l'item du stockage
     let product = JSON.parse(localStorage.getItem(i));
@@ -173,6 +163,7 @@ function onchangeProductCart(i){
     localStorage.setItem(i,JSON.stringify(product));
     //Modifie le paragraphe associé
     document.getElementsByClassName("cart__item__content__settings__quantity")[i].firstChild.innerHTML="Qté : "+document.getElementsByClassName("itemQuantity")[i].value;
+    refreshPanier();
 }
 function deleteProductCart(y){
     //Dernier element du tableau Y+1 pour le 0
@@ -203,16 +194,30 @@ function deleteProductCart(y){
     }
     document.getElementsByClassName("cart__item ")[y].remove();
     refreshPanier();
-    /*
-    document.getElementsByClassName("cart__item__content__settings__quantity")[0].lastChild.attributes["onchange"]="onchangeProductCart("+i+")";
-    document.getElementsByClassName("deleteItem").attributes["onclick"]="deleteProductCart("+i+")";
-    */
 }
-function refreshPanier(){
+async function refreshPanier(){
     //Modification de la valeur Onchange et Onclick
     for (i=0;i<localStorage.length;i++){
         console.log("Refresh ligne:"+i);
         document.getElementsByClassName("cart__item__content__settings__quantity")[i].lastChild.attributes["onchange"].value="onchangeProductCart("+i+")";
         document.getElementsByClassName("deleteItem")[i].attributes["onclick"].value="deleteProductCart("+i+")";
     }
+
+    //Modification prix total panier et nombre d'article
+    let allPrice=0;
+    let allQuantity=0;
+    
+    for (i=0;i<localStorage.length;i++){
+        product=JSON.parse(localStorage.getItem(i));
+        console.log("MAJ prix: "+i+" Recherche product id:"+product.id);
+        //refreshPriceQuantity(product,allPrice,allQuantity);
+        await getProductById(product.id).then((result) => {
+            allPrice+=result.price*product.quantity;
+            console.log("Prix:"+allPrice);        
+            allQuantity+=parseInt(product.quantity,10);
+            console.log("Quantity: "+allQuantity);
+        });
+    }
+    document.getElementById("totalQuantity").innerHTML=allQuantity;
+    document.getElementById("totalPrice").innerHTML=allPrice;  
 }
