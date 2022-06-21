@@ -52,6 +52,15 @@ function changeProduct(){
     clickaddToCart();
 }
 function addToCart(){
+document.getElementById("animation__container__notification").classList.toggle("animation");
+document.getElementById("addToCart").disabled="true";
+document.getElementById("addToCart").style.opacity="0.7";
+window.setTimeout( function(){
+    document.getElementById("animation__container__notification").classList.remove("animation");
+    document.getElementById("addToCart").disabled="";
+    document.getElementById("addToCart").style.opacity="1";
+} , 3000);
+
 let id=getIdProductPage();
 let color=document.getElementById("colors").value;
 let quantity=document.getElementById("quantity").value;
