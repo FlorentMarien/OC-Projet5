@@ -1,7 +1,6 @@
 // Product
 function getIdProductPage(){
     let id = window.location.search;
-    console.log(id);
     // slice retire 4 premiers caractère
     return id.slice(4);
 }
@@ -120,30 +119,7 @@ async function getCart(){
         });
     }
     refreshPanier();
-    document.getElementById("order").addEventListener("click", function(event){
-        event.preventDefault();
-        let product;
-        let arrayCart=new Array;
-        let arrayFormulaire=new Object;
-        arrayFormulaire.firstName=document.getElementById("firstName").value;
-        arrayFormulaire.lastName=document.getElementById("lastName").value;
-        arrayFormulaire.address=document.getElementById("address").value;
-        arrayFormulaire.city=document.getElementById("city").value;
-        arrayFormulaire.email=document.getElementById("email").value;
-        for(i=0;i<localStorage.length;i++){
-            product=JSON.parse(localStorage.getItem(i));
-            arrayCart.push(product.id);
-        }
-        sendCart(arrayFormulaire,arrayCart).then((result)=>{
-            let reqData = {
-                reqObjectFormulaire: result.contact,
-                reqArrayCart: result.products,
-                reqOrderId: result.orderId
-            };
-            localStorage.clear();
-            window.location="http://127.0.0.1:5500/front/html/confirmation.html?id="+result.orderId;
-        });
-    });
+    document.getElementById("order").addEventListener("click", getFormulaire);
 }
 function onchangeProductCart(i){
     //Recuperation de l'item du stockage
@@ -180,7 +156,6 @@ function deleteProductCart(y){
                 console.log("Suppression ligne "+i);
                 i=localStorage.length+1;
             }
-            
         }
     }
     document.getElementsByClassName("cart__item ")[y].remove();
@@ -209,18 +184,25 @@ async function refreshPanier(){
     document.getElementById("totalQuantity").innerHTML=allQuantity;
     document.getElementById("totalPrice").innerHTML=allPrice;  
 }
-/*function getFormulaire(e){
-    //VERIF A FAIRe
+function getFormulaire(e){
     e.preventDefault();
-    document.getElementById("order").preventDefault
-    let firstName=document.getElementById("firstName").value;
-    let lastName=document.getElementById("lastName").value;
-    let address=document.getElementById("address").value;
-    let city=document.getElementById("city").value;
-    let email=document.getElementById("email").value;
-    let arrayformulaire={"firstName":firstName,"lastName":lastName,"address":address,"city":city,"email":email};
-    console.log("FirstName:"+arrayformulaire.firstName+ " LastName:"+arrayformulaire.lastName+ " address:"+arrayformulaire.address+" city:"+arrayformulaire.city+ " email:"+arrayformulaire.email);
-}*/
+    let product;
+    let arrayCart=new Array;
+    let arrayFormulaire=new Object;
+    arrayFormulaire.firstName=document.getElementById("firstName").value;
+    arrayFormulaire.lastName=document.getElementById("lastName").value;
+    arrayFormulaire.address=document.getElementById("address").value;
+    arrayFormulaire.city=document.getElementById("city").value;
+    arrayFormulaire.email=document.getElementById("email").value;
+    for(i=0;i<localStorage.length;i++){
+        product=JSON.parse(localStorage.getItem(i));
+        arrayCart.push(product.id);
+    }
+    sendCart(arrayFormulaire,arrayCart).then((result)=>{
+        localStorage.clear();
+        window.location="http://127.0.0.1:5500/front/html/confirmation.html?id="+result.orderId;
+    });
+}
 async function sendCart(objectFormulaire,arrayCart){
     const orderData = {
         contact: objectFormulaire,
@@ -240,7 +222,6 @@ async function sendCart(objectFormulaire,arrayCart){
         }
       })
       .then(function(result) {
-        console.log("Reception de l'order id:"+result.orderId);
         return result;
       })
       .catch(function(err) {
