@@ -27,9 +27,8 @@ async function getElements(){
 // Product
 function getIdProductPage(){
     let id = window.location.search;
-    let tampon2="";
-    tampon2=id.slice(4);
-    return tampon2;
+    // slice retire 4 premiers caractère
+    return id.slice(4);
 }
 async function getProductById(id){
     return await fetch("http://localhost:3000/api/products/"+id)
@@ -172,6 +171,10 @@ async function getCart(){
                 reqArrayCart: result.products,
                 reqOrderId: result.orderId
             };
+            console.log("Supression panier");
+            
+            document.getElementById("cart__items").innerHTML="<h2>Merci pour votre commande !</br>Numéro de commande:</br>"+result.orderId+"</h2>";
+            localStorage.clear();
         });
     });
 }
