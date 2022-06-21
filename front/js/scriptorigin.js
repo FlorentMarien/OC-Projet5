@@ -19,6 +19,8 @@ async function getProductById(id){
     });
 }
 function changeProduct(){
+//Verification si l'id n'est pas déjà enregistré
+
     getProductById(getIdProductPage()).then((result) => {                     
         //Ajout de l'image
         document
@@ -47,41 +49,48 @@ function changeProduct(){
             .innerHTML+="<option value=\""+iterator+"\">"+iterator+"</option>";
         }
     });
+    clickaddToCart();
 }
 function addToCart(){
-// ID COULEUR QUANTITE
-getProductById(getIdProductPage()).then((result) => {
-    let id=result._id;
-    let color=document.getElementById("colors").value;
-    let quantity=document.getElementById("quantity").value;
-    let product={'id':id,'color':color,'quantity':quantity};
-    let verif=0;
-    let pos=0;
-    //test for localstorage 
-    let test;
-    for (var i = 0; i < localStorage.length; i++) {
-        test=JSON.parse(localStorage.getItem(i));
-        if((test.id==id) && (test.color==color)){
-            console.log("Element déjà ajouté, ajout de la quantité");
-            verif++;
-            pos=i;
+let id=getIdProductPage();
+let color=document.getElementById("colors").value;
+let quantity=document.getElementById("quantity").value;
+let productClient={'id':id,'color':color,'quantity':quantity};
+let productStorage;
+let verif={
+    similarIdColor:0,
+    possimilarIdColor:0,
+    similarId:0,
+    possimilarId:0
+}
+    for(i=0;i<localStorage.length;i++){
+        productStorage=localStorage.getItem(i);
+        productStorage=JSON.parse(productStorage);
+        if((productClient.id==productStorage.id) && (productClient.color==productStorage.color)){
+            console.log("Produit de même couleur déjà ajouté, ajout de la quantité");
+            
+            let x=parseInt(productStorage.quantity,10);
+            let tampon=parseInt(productClient.quantity,10) + x;
+            productClient.quantity=tampon;
+            localStorage.setItem(i,JSON.stringify(productClient));
+
+            verif.similarIdColor++;
+            verif.posIdColor=i;
             i=localStorage.length+1;
         }
-        
+        else if(productClient.id==productStorage.id){
+            verif.similarId++;
+            verif.possimilarId=i;
+        }
     }
-    if(verif==0){
-        localStorage.setItem(localStorage.length,JSON.stringify(product));
-        console.log("L'article n'a pas été trouvé dans la panier, ajout");
-    }   
-    else{
-        product=localStorage.getItem(pos);
-        product=JSON.parse(product);
-        let x=parseInt(product.quantity,10);
-        let tampon= parseInt(quantity,10) + x;
-        product.quantity=tampon;
-        localStorage.setItem(pos,JSON.stringify(product));
-    }   
-});
+    if(verif.similarIdColor==0 && verif.similarId!=0){
+        console.log("Produit de couleur différente déjà ajouté, ajout de la couleur via l'id");
+        localStorage.setItem(localStorage.length,JSON.stringify(productClient));
+    }
+    else if(verif.similarIdColor==0 && verif.similarId==0){
+        console.log("Ajout du produit");
+        localStorage.setItem(localStorage.length,JSON.stringify(productClient));
+    }
 }
 function clickaddToCart(){
     document.getElementById("addToCart").addEventListener("click",addToCart);
@@ -90,11 +99,31 @@ function clickaddToCart(){
 // Cart
 async function getCart(){
     let product;
+    let stockageapiproduct=[];
+    
     // addProductCart(product.id,product,i);
     for (i=0 ; i<localStorage.length ;i++){
+        let verif=0;
         product=JSON.parse(localStorage.getItem(i));
-        await getProductById(product.id).then((apiproduct) => {
-            document.getElementById("cart__items").innerHTML+=
+        for(y=0 ; y<stockageapiproduct.length;y++){
+            if(stockageapiproduct[y]._id==product.id){
+                writeArticleCart(stockageapiproduct[y],product);
+                verif++;
+                y=stockageapiproduct.length;
+            }
+        }
+        if(verif==0){
+            await getProductById(product.id).then((apiproduct) => {
+                stockageapiproduct.push(apiproduct);
+                writeArticleCart(apiproduct,product); 
+            });
+        }  
+    }
+    refreshPanier();
+    document.getElementById("order").addEventListener("click", getFormulaire);
+}
+function writeArticleCart(apiproduct,product){
+    document.getElementById("cart__items").innerHTML+=
             "<article class=\"cart__item\" data-id=\""+product.id+"\" data-color=\""+product.color+"\">"+
                 "<div class=\"cart__item__img\">"+
                     "<img src=\""+apiproduct.imageUrl+"\" alt=\""+apiproduct.altTxt+"\">"+
@@ -116,10 +145,6 @@ async function getCart(){
                 "</div>"+
                 "</div>"+
             "</article>";
-        });
-    }
-    refreshPanier();
-    document.getElementById("order").addEventListener("click", getFormulaire);
 }
 function onchangeProductCart(i){
     //Recuperation de l'item du stockage
