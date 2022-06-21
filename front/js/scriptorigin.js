@@ -119,8 +119,8 @@ async function getCart(){
             });
         }  
     }
-    //refreshPanier();
     addEventCart();
+    refreshPanier();
 }
 function writeArticleCart(apiproduct,product){
     document.getElementById("cart__items").innerHTML+=
@@ -147,7 +147,7 @@ function writeArticleCart(apiproduct,product){
             "</article>";
 }
 function addEventCart(){
-    //document.getElementById("order").addEventListener("click", getFormulaire);
+    document.getElementById("order").addEventListener("click", getFormulaire);
     for(i=0;i<localStorage.length;i++){
         document.getElementsByClassName("itemQuantity")[i].addEventListener("change", onchangeProductCart);
         document.getElementsByClassName("deleteItem")[i].addEventListener("click", deleteProductCart);
@@ -163,14 +163,12 @@ function onchangeProductCart(){
         localStorage.setItem(i,JSON.stringify(product));
         //Modifie le paragraphe associé
         document.getElementsByClassName("cart__item__content__settings__quantity")[i].firstChild.innerHTML="Qté : "+document.getElementsByClassName("itemQuantity")[i].value;
-        //refreshPanier();
     }
+    refreshPanier();
 }
 function deleteProductCart(){
     //Dernier element du tableau Y+1 pour le 0
     //Y = position de l'élement supprimer
-    //Soit recuperation data-id et color pour recherche dans le storage
-    //Soit recuperation d'un pointer de placement dans le html
     let y=0;
     let productHtml={
         dataId:this.parentNode.parentNode.parentNode.parentNode.attributes["data-id"].value,
@@ -213,20 +211,12 @@ function deleteProductCart(){
     refreshPanier();
 }
 async function refreshPanier(){
-    //Modification de la valeur Onchange et Onclick
-    for (i=0;i<localStorage.length;i++){
-        console.log("Refresh ligne:"+i);
-        document.getElementsByClassName("cart__item__content__settings__quantity")[i].addEventListener("change",onchangeProductCart);
-        document.getElementsByClassName("deleteItem")[i].addEventListener("click",deleteProductCart);
-    }
-
     //Modification prix total panier et nombre d'article
     let allPrice=0;
     let allQuantity=0;
     
     for (i=0;i<localStorage.length;i++){
         product=JSON.parse(localStorage.getItem(i));
-        //refreshPriceQuantity(product,allPrice,allQuantity);
         await getProductById(product.id).then((result) => {
             allPrice+=result.price*product.quantity; 
             allQuantity+=parseInt(product.quantity,10);
@@ -236,7 +226,7 @@ async function refreshPanier(){
     document.getElementById("totalPrice").innerHTML=allPrice;  
 }
 function getFormulaire(e){
-    //e.preventDefault();
+    e.preventDefault();
     let product;
     let arrayCart=new Array;
     let arrayFormulaire=new Object;
