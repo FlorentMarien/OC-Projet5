@@ -1,32 +1,7 @@
-//Index
-async function getElements(){
-    await fetch("http://localhost:3000/api/products")
-      .then(function(res) {
-        if (res.ok) {
-          return res.json();
-        }
-      })
-      .then(function(result) {
-        
-        for (const value of result) {
-          document.getElementById("items").innerHTML+=
-          "<a href=\"./product.html?id="+value._id+"\">"+
-            "<article>"+
-              "<img src=\""+value.imageUrl+"\" alt=\""+value.altTxt+"\">"+
-              "<h3 class=\"productName\">"+value.name+"</h3>"+
-              "<p class=\"productDescription\">"+value.description+"</p>"+
-            "</article>"+
-          "</a>";
-        }
-      })
-      .catch(function(err) {
-        // Une erreur est survenue
-      });
-}
-//
 // Product
 function getIdProductPage(){
     let id = window.location.search;
+    console.log(id);
     // slice retire 4 premiers caractère
     return id.slice(4);
 }
@@ -38,14 +13,12 @@ async function getProductById(id){
     }
     })
     .then(function(result) {
-        
         return result;
     })
     .catch(function(err) {
     // Une erreur est survenue
     });
 }
-
 function changeProduct(){
     getProductById(getIdProductPage()).then((result) => {                     
         //Ajout de l'image
@@ -77,10 +50,6 @@ function changeProduct(){
     });
 }
 function addToCart(){
-/*
-var voiture = { modele : Clio, marque Renault };
-localStorage.setItem('maVoiture', JSON.stringify(voiture));
-*/
 // ID COULEUR QUANTITE
 getProductById(getIdProductPage()).then((result) => {
     let id=result._id;
@@ -171,10 +140,8 @@ async function getCart(){
                 reqArrayCart: result.products,
                 reqOrderId: result.orderId
             };
-            console.log("Supression panier");
-            
-            document.getElementById("cart__items").innerHTML="<h2>Merci pour votre commande !</br>Numéro de commande:</br>"+result.orderId+"</h2>";
             localStorage.clear();
+            window.location="http://127.0.0.1:5500/front/html/confirmation.html?id="+result.orderId;
         });
     });
 }
