@@ -119,8 +119,8 @@ async function getCart(){
             });
         }  
     }
-    refreshPanier();
-    document.getElementById("order").addEventListener("click", getFormulaire);
+    //refreshPanier();
+    addEventCart();
 }
 function writeArticleCart(apiproduct,product){
     document.getElementById("cart__items").innerHTML+=
@@ -137,29 +137,55 @@ function writeArticleCart(apiproduct,product){
                 "<div class=\"cart__item__content__settings\">"+
                     "<div class=\"cart__item__content__settings__quantity\">"+
                         "<p>Qté : "+product.quantity+"</p>"+
-                      "<input type=\"number\" class=\"itemQuantity\" name=\"itemQuantity\" min=\"1\" max=\"100\" onchange=\"onchangeProductCart("+i+")\" value=\""+product.quantity+"\">"+
+                      "<input type=\"number\" class=\"itemQuantity\" name=\"itemQuantity\" min=\"1\" max=\"100\" value=\""+product.quantity+"\">"+
                     "</div>"+
                     "<div class=\"cart__item__content__settings__delete\">"+
-                      "<p class=\"deleteItem\" onclick=\"deleteProductCart("+i+")\">Supprimer</p>"+
+                      "<p class=\"deleteItem\">Supprimer</p>"+
                     "</div>"+
                 "</div>"+
                 "</div>"+
             "</article>";
 }
-function onchangeProductCart(i){
-    //Recuperation de l'item du stockage
-    let product = JSON.parse(localStorage.getItem(i));
-    //Modification de la valeur quantité avec celle du selecteur
-    product.quantity=document.getElementsByClassName("itemQuantity")[i].value;
-    //Ajout avec modification
-    localStorage.setItem(i,JSON.stringify(product));
-    //Modifie le paragraphe associé
-    document.getElementsByClassName("cart__item__content__settings__quantity")[i].firstChild.innerHTML="Qté : "+document.getElementsByClassName("itemQuantity")[i].value;
-    refreshPanier();
+function addEventCart(){
+    //document.getElementById("order").addEventListener("click", getFormulaire);
+    for(i=0;i<localStorage.length;i++){
+        document.getElementsByClassName("itemQuantity")[i].addEventListener("change", onchangeProductCart);
+        document.getElementsByClassName("deleteItem")[i].addEventListener("click", deleteProductCart);
+    }
 }
-function deleteProductCart(y){
+function onchangeProductCart(){
+    //Recuperation de l'item du stockage
+    for(i=0;i<localStorage.length;i++){
+        let product = JSON.parse(localStorage.getItem(i));
+        //Modification de la valeur quantité avec celle du selecteur
+        product.quantity=document.getElementsByClassName("itemQuantity")[i].value;
+        //Ajout avec modification
+        localStorage.setItem(i,JSON.stringify(product));
+        //Modifie le paragraphe associé
+        document.getElementsByClassName("cart__item__content__settings__quantity")[i].firstChild.innerHTML="Qté : "+document.getElementsByClassName("itemQuantity")[i].value;
+        //refreshPanier();
+    }
+}
+function deleteProductCart(){
     //Dernier element du tableau Y+1 pour le 0
+    //Y = position de l'élement supprimer
+    //Soit recuperation data-id et color pour recherche dans le storage
+    //Soit recuperation d'un pointer de placement dans le html
+    let y=0;
+    let productHtml={
+        dataId:this.parentNode.parentNode.parentNode.parentNode.attributes["data-id"].value,
+        dataColor:this.parentNode.parentNode.parentNode.parentNode.attributes["data-color"].value
+    }
+
+    console.log(productHtml.dataId);
     
+    for(i=0;i<localStorage.length;i++){
+        let product = JSON.parse(localStorage.getItem(i));
+        if(product.id==productHtml.dataId && product.color==productHtml.dataColor){
+            y=i;
+            console.log(y);
+        }
+    }
     if(localStorage.length==y+1){
         console.log("Problème dernière ligne:"+y+" / Supression")
         localStorage.removeItem(y);
@@ -190,8 +216,8 @@ async function refreshPanier(){
     //Modification de la valeur Onchange et Onclick
     for (i=0;i<localStorage.length;i++){
         console.log("Refresh ligne:"+i);
-        document.getElementsByClassName("cart__item__content__settings__quantity")[i].lastChild.attributes["onchange"].value="onchangeProductCart("+i+")";
-        document.getElementsByClassName("deleteItem")[i].attributes["onclick"].value="deleteProductCart("+i+")";
+        document.getElementsByClassName("cart__item__content__settings__quantity")[i].addEventListener("change",onchangeProductCart);
+        document.getElementsByClassName("deleteItem")[i].addEventListener("click",deleteProductCart);
     }
 
     //Modification prix total panier et nombre d'article
@@ -210,7 +236,7 @@ async function refreshPanier(){
     document.getElementById("totalPrice").innerHTML=allPrice;  
 }
 function getFormulaire(e){
-    e.preventDefault();
+    //e.preventDefault();
     let product;
     let arrayCart=new Array;
     let arrayFormulaire=new Object;
