@@ -164,7 +164,6 @@ function addEventCart(){
 }
 function onchangeProductCart(){
     //Recuperation de l'item du stockage
-    //animationonchangeproductCart();
     let i=0;
     for(i=0;i<localStorage.length;i++){
         let product = JSON.parse(localStorage.getItem(i));
@@ -177,7 +176,6 @@ function onchangeProductCart(){
             animationonchangeproductCart(i);
         }
     }
-    
     refreshPanier();
 }
 function animationonchangeproductCart(i){
@@ -257,8 +255,20 @@ async function refreshPanier(){
             allQuantity+=parseInt(product.quantity,10);
         });
     }
-    document.getElementById("totalQuantity").innerHTML=allQuantity;
-    document.getElementById("totalPrice").innerHTML=allPrice;  
+    animationPrixQuantityPanier(allQuantity,allPrice);
+}
+function animationPrixQuantityPanier(allQuantity,allPrice){
+    //Ajout Logo 
+    document.getElementById("totalQuantity").innerHTML="<i class=\"fa-solid fa-spinner\"></i>";
+    document.getElementById("totalPrice").innerHTML="<i class=\"fa-solid fa-spinner\"></i>";
+    //Ajout de l'animation
+    document.getElementById("totalQuantity").firstChild.classList.toggle("animationchangequantity");
+    document.getElementById("totalPrice").firstChild.classList.toggle("animationchangequantity");
+    
+    window.setTimeout(function (){
+        document.getElementById("totalQuantity").innerHTML=allQuantity;
+        document.getElementById("totalPrice").innerHTML=allPrice;
+    },1500);
 }
 function getFormulaire(e){
     e.preventDefault();

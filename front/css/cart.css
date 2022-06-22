@@ -167,11 +167,10 @@ h2 {
 	animation-fill-mode: forwards;
 }
 i.fa-solid{
-	width: 20px;
-	height:20px;
-	display: flex;
-	justify-content: center;
-	align-items: center;
+	width: 22px;
+	height:22px;
+	text-align: center;
+	line-height: 22px;
 }
 
 /***************/
