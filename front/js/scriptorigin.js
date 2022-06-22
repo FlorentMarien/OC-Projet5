@@ -216,8 +216,17 @@ function deleteProductCart(){
             }
         }
     }
-    document.getElementsByClassName("cart__item ")[y].remove();
+    animationSupression(y);
     refreshPanier();
+}
+
+function animationSupression(y){
+    document.getElementsByClassName("cart__item")[y].classList.toggle("animationcachesupression");
+    
+    window.setTimeout( function(){
+        document.getElementsByClassName("cart__item")[y].remove();
+        //Supression du block
+    } , 1500);
 }
 async function refreshPanier(){
     //Modification prix total panier et nombre d'article

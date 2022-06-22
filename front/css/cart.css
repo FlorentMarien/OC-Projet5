@@ -21,6 +21,8 @@ h2 {
 	border-top: 1px solid white;
 	padding-top: 35px;
 	margin-bottom: 30px;
+	overflow: hidden;
+	height: 219px;
 }
 .cart__item__img {
 	width: 25%;
@@ -133,8 +135,24 @@ h2 {
 .cart__order__form__submit input:hover {
 	box-shadow: rgb(42 18 206 / 90%) 0 0 22px 6px;
 }
-
-
+@keyframes animationcachesupression{
+	0% {
+		opacity: 1;
+		padding-top: 35px;
+		margin-bottom: 30px;
+	}
+	100%{
+		opacity: 0;
+		padding-top: 0px;
+		margin-bottom: 0px;
+		height: 0px;
+	}
+}
+.animationcachesupression{
+	animation-name:animationcachesupression;
+	animation-duration: 1.5s;
+	animation-fill-mode: forwards;
+}
 
 /***************/
 /*Media queries*/
@@ -150,6 +168,7 @@ h2 {
 	.cart__item {
 		flex-direction: column;
 		align-items: center;
+		height: 405px;
 	}
 	.cart__item__img {
 		width: 50%;
