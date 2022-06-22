@@ -164,16 +164,33 @@ function addEventCart(){
 }
 function onchangeProductCart(){
     //Recuperation de l'item du stockage
+    //animationonchangeproductCart();
+    let i=0;
     for(i=0;i<localStorage.length;i++){
         let product = JSON.parse(localStorage.getItem(i));
         //Modification de la valeur quantité avec celle du selecteur
-        product.quantity=document.getElementsByClassName("itemQuantity")[i].value;
-        //Ajout avec modification
-        localStorage.setItem(i,JSON.stringify(product));
-        //Modifie le paragraphe associé
-        document.getElementsByClassName("cart__item__content__settings__quantity")[i].firstChild.innerHTML="Qté : "+document.getElementsByClassName("itemQuantity")[i].value;
+        if(product.quantity!=document.getElementsByClassName("itemQuantity")[i].value){
+            //Ajout avec modification
+            product.quantity=document.getElementsByClassName("itemQuantity")[i].value;
+            localStorage.setItem(i,JSON.stringify(product));
+            //Animation et Modifie le paragraphe associe
+            animationonchangeproductCart(i);
+        }
     }
+    
     refreshPanier();
+}
+function animationonchangeproductCart(i){
+    //Ajout du logo de chargement
+    document.getElementsByClassName("cart__item__content__settings__quantity")[i].firstChild.innerHTML="<i class=\"fa-solid fa-spinner\"></i>";
+    //Ajout de l'animation
+    document.getElementsByClassName("cart__item__content__settings__quantity")[i].firstChild.firstChild.classList.toggle("animationchangequantity");
+    //Blocage de l'input
+    document.getElementsByClassName("itemQuantity")[i].disabled="disabled";
+    window.setTimeout(function (){
+        document.getElementsByClassName("cart__item__content__settings__quantity")[i].firstChild.innerHTML="Qté : "+document.getElementsByClassName("itemQuantity")[i].value;
+        document.getElementsByClassName("itemQuantity")[i].disabled="";
+    },1500);
 }
 function deleteProductCart(){
     //Dernier element du tableau Y+1 pour le 0

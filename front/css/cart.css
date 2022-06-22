@@ -148,10 +148,30 @@ h2 {
 		height: 0px;
 	}
 }
+@keyframes animationchangequantity{
+	0% {
+		rotate: 0deg;
+	}
+	100%{
+		rotate:720deg;
+	}
+}
 .animationcachesupression{
 	animation-name:animationcachesupression;
 	animation-duration: 1.5s;
 	animation-fill-mode: forwards;
+}
+.animationchangequantity{
+	animation-name:animationchangequantity;
+	animation-duration: 1.5s;
+	animation-fill-mode: forwards;
+}
+i.fa-solid{
+	width: 20px;
+	height:20px;
+	display: flex;
+	justify-content: center;
+	align-items: center;
 }
 
 /***************/
