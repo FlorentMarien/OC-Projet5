@@ -48,61 +48,71 @@ function changeProduct(){
             .getElementById("colors")
             .innerHTML+="<option value=\""+iterator+"\">"+iterator+"</option>";
         }
+        productQuantity();
     });
-    clickaddToCart();
+    clickaddProduct();
+}
+function productQuantity(){
+    let product;
+    let verif=0;
+        for(i=0;i<localStorage.length;i++){
+            product=JSON.parse(localStorage.getItem(i));
+            if(product.id==getIdProductPage() && product.color==document.getElementById("colors").value){
+                document.getElementById("quantity").value=product.quantity;
+                verif++;
+                i=localStorage.length+1;
+            }
+        }
+        if(verif==0){
+            document.getElementById("quantity").value=0;
+        }
+}
+function animationaddToCart(i){
+    // 0 Article non ajouté // 1 Article déjà enregistré // 2 Limite de 100 // 3 Valeur 0 Ajouté
+    if(i==2) document.getElementById("quantity").value=100;
+    if(i==3) document.getElementById("quantity").value=1;
+    let arrayMessage=["Votre article a bien été ajouté","Modification de la quantité","Article limité à 100 exemplaires","Vous n'avez pas modifié le nombre d'article"]
+    document.getElementById("animation__container__notification").firstChild.innerHTML=arrayMessage[i];
+    document.getElementById("animation__container__notification").classList.toggle("animation");
+    document.getElementById("addToCart").disabled="true";
+    document.getElementById("addToCart").style.opacity="0.7";
+    window.setTimeout( function(){
+        document.getElementById("animation__container__notification").classList.remove("animation");
+        document.getElementById("addToCart").disabled="";
+        document.getElementById("addToCart").style.opacity="1";
+    } , 3000);
 }
 function addToCart(){
-document.getElementById("animation__container__notification").classList.toggle("animation");
-document.getElementById("addToCart").disabled="true";
-document.getElementById("addToCart").style.opacity="0.7";
-window.setTimeout( function(){
-    document.getElementById("animation__container__notification").classList.remove("animation");
-    document.getElementById("addToCart").disabled="";
-    document.getElementById("addToCart").style.opacity="1";
-} , 3000);
 
+//animationaddToCart();
 let id=getIdProductPage();
 let color=document.getElementById("colors").value;
 let quantity=document.getElementById("quantity").value;
 let productClient={'id':id,'color':color,'quantity':quantity};
 let productStorage;
-let verif={
-    similarIdColor:0,
-    possimilarIdColor:0,
-    similarId:0,
-    possimilarId:0
-}
-    for(i=0;i<localStorage.length;i++){
-        productStorage=localStorage.getItem(i);
-        productStorage=JSON.parse(productStorage);
-        if((productClient.id==productStorage.id) && (productClient.color==productStorage.color)){
-            console.log("Produit de même couleur déjà ajouté, ajout de la quantité");
-            
-            let x=parseInt(productStorage.quantity,10);
-            let tampon=parseInt(productClient.quantity,10) + x;
-            productClient.quantity=tampon;
-            localStorage.setItem(i,JSON.stringify(productClient));
-
-            verif.similarIdColor++;
-            verif.posIdColor=i;
-            i=localStorage.length+1;
+let verif=0;
+    if(quantity==0) animationaddToCart(3);
+    if(quantity>100) animationaddToCart(2);
+    if(quantity>0 && quantity<=100){      
+        for(i=0;i<localStorage.length;i++){
+            productStorage=localStorage.getItem(i);
+            productStorage=JSON.parse(productStorage);
+            if(productClient.id==productStorage.id && productClient.color==productStorage.color){
+                localStorage.setItem(i,JSON.stringify(productClient));
+                i=localStorage.length+1;
+                verif++;
+                animationaddToCart(1)
+            }
         }
-        else if(productClient.id==productStorage.id){
-            verif.similarId++;
-            verif.possimilarId=i;
+        if(verif==0){
+            localStorage.setItem(localStorage.length,JSON.stringify(productClient));
+            animationaddToCart(0);
         }
     }
-    if(verif.similarIdColor==0 && verif.similarId!=0){
-        console.log("Produit de couleur différente déjà ajouté, ajout de la couleur via l'id");
-        localStorage.setItem(localStorage.length,JSON.stringify(productClient));
-    }
-    else if(verif.similarIdColor==0 && verif.similarId==0){
-        console.log("Ajout du produit");
-        localStorage.setItem(localStorage.length,JSON.stringify(productClient));
-    }
 }
-function clickaddToCart(){
+function clickaddProduct(){
     document.getElementById("addToCart").addEventListener("click",addToCart);
+    document.getElementById("colors").addEventListener("change",productQuantity);
 }
 //
 // Cart
