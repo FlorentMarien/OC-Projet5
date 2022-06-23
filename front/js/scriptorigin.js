@@ -208,22 +208,7 @@ function animationonchangeproductCart(i){
     },1500);
 }
 function deleteProductCartByPos(pos){
-    localStorage.removeItem(pos);
-    for (i=pos;i<localStorage.length;i++){    
-        if(localStorage.getItem(i+1)!=null ){
-            message=i+1;
-            console.log("Modification de la ligne: "+i+" avec la ligne: "+message);
-            product = JSON.parse(localStorage.getItem(i+1));
-            localStorage.setItem(i,JSON.stringify(product));
-        }
-        else{
-            localStorage.removeItem(i);
-            console.log("Suppression ligne "+i);
-            i=localStorage.length+1;
-        }
-    }
-    animationSupression(pos);
-    refreshPanier();
+    refreshStoragePanier(pos);
 }
 function deleteProductCart(){
     //Dernier element du tableau Y+1 pour le 0
@@ -243,6 +228,9 @@ function deleteProductCart(){
             console.log(y);
         }
     }
+    refreshStoragePanier(y);
+}
+function refreshStoragePanier(y){
     if(localStorage.length==y+1){
         console.log("Problème dernière ligne:"+y+" / Supression")
         localStorage.removeItem(y);
@@ -269,7 +257,6 @@ function deleteProductCart(){
     animationSupression(y);
     refreshPanier();
 }
-
 function animationSupression(y){
     document.getElementsByClassName("cart__item")[y].classList.toggle("animationcachesupression");
     
