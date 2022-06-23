@@ -280,14 +280,52 @@ function getFormulaire(e){
     arrayFormulaire.address=document.getElementById("address").value;
     arrayFormulaire.city=document.getElementById("city").value;
     arrayFormulaire.email=document.getElementById("email").value;
-    for(i=0;i<localStorage.length;i++){
-        product=JSON.parse(localStorage.getItem(i));
-        arrayCart.push(product.id);
+    if(verifformulaire(arrayFormulaire)==1){
+        for(i=0;i<localStorage.length;i++){
+            product=JSON.parse(localStorage.getItem(i));
+            arrayCart.push(product.id);
+        }
+        sendCart(arrayFormulaire,arrayCart).then((result)=>{
+            localStorage.clear();
+            window.location="http://127.0.0.1:5500/front/html/confirmation.html?id="+result.orderId;
+        });
     }
-    sendCart(arrayFormulaire,arrayCart).then((result)=>{
-        localStorage.clear();
-        window.location="http://127.0.0.1:5500/front/html/confirmation.html?id="+result.orderId;
-    });
+}
+function verifformulaire(arrayFormulaire){
+    let verif=1;
+    if(/[^A-Za-z]/.test(arrayFormulaire.firstName)){
+        document.getElementById("firstNameErrorMsg").innerHTML="Problème avec la saisie de votre Nom";
+        verif++;
+    }
+    else{
+        document.getElementById("firstNameErrorMsg").innerHTML="";   
+    }
+    if(/[^A-Za-z]/.test(arrayFormulaire.lastName)){
+        document.getElementById("lastNameErrorMsg").innerHTML="Problème avec la saisie de votre Prenom";
+        verif++;
+    }
+    else{
+        document.getElementById("lastNameErrorMsg").innerHTML="";
+    }
+    /*if(/[^A-Za-z]/.test(arrayFormulaire.address)){
+        
+    }*/
+    if(/[^A-Za-z]/.test(arrayFormulaire.city)){
+        document.getElementById("cityErrorMsg").innerHTML="Problème avec la saisie de votre ville";
+        verif++;
+    }
+    else{
+        document.getElementById("cityErrorMsg").innerHTML="";
+    }
+    if(!/[@]/.test(arrayFormulaire.email)){
+        document.getElementById("emailErrorMsg").innerHTML="Problème avec la saisie de votre adresse mail";
+        verif++;
+    }
+    else{
+        document.getElementById("emailErrorMsg").innerHTML="";
+    }
+    return verif;
+    
 }
 async function sendCart(objectFormulaire,arrayCart){
     const orderData = {

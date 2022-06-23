@@ -66,6 +66,7 @@ h2 {
 .cart__item__content__settings__quantity p {
 	margin-right: 10px;
 	display: flex;
+	width: 70px;
 }
 .cart__item__content__settings__delete p {
 	display: inline;
