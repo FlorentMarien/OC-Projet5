@@ -180,18 +180,15 @@ function onchangeProductCart(){
         //Modification de la valeur quantité avec celle du selecteur
         if(product.quantity!=document.getElementsByClassName("itemQuantity")[i].value){
             //Ajout avec modification
-            if(document.getElementsByClassName("itemQuantity")[i].value>100){
-                product.quantity=100;
-                localStorage.setItem(i,JSON.stringify(product));
-                console.log("Limite d'ajout dépassé");
-            }
+            if(document.getElementsByClassName("itemQuantity")[i].value==0) deleteProductCartByPos(i);
             else{
-                product.quantity=document.getElementsByClassName("itemQuantity")[i].value;
+                if(document.getElementsByClassName("itemQuantity")[i].value>100) product.quantity=100;
+                else product.quantity=document.getElementsByClassName("itemQuantity")[i].value;
+                
                 localStorage.setItem(i,JSON.stringify(product));
+                //Animation et Modifie le paragraphe associe
+                animationonchangeproductCart(i);
             }
-            
-            //Animation et Modifie le paragraphe associe
-            animationonchangeproductCart(i);
         }
     }
     refreshPanier();
@@ -209,6 +206,24 @@ function animationonchangeproductCart(i){
         document.getElementsByClassName("cart__item__content__settings__quantity")[i].firstChild.innerHTML="Qté : "+product.quantity;
         document.getElementsByClassName("itemQuantity")[i].disabled="";
     },1500);
+}
+function deleteProductCartByPos(pos){
+    localStorage.removeItem(pos);
+    for (i=pos;i<localStorage.length;i++){    
+        if(localStorage.getItem(i+1)!=null ){
+            message=i+1;
+            console.log("Modification de la ligne: "+i+" avec la ligne: "+message);
+            product = JSON.parse(localStorage.getItem(i+1));
+            localStorage.setItem(i,JSON.stringify(product));
+        }
+        else{
+            localStorage.removeItem(i);
+            console.log("Suppression ligne "+i);
+            i=localStorage.length+1;
+        }
+    }
+    animationSupression(pos);
+    refreshPanier();
 }
 function deleteProductCart(){
     //Dernier element du tableau Y+1 pour le 0
@@ -231,7 +246,7 @@ function deleteProductCart(){
     if(localStorage.length==y+1){
         console.log("Problème dernière ligne:"+y+" / Supression")
         localStorage.removeItem(y);
-    }
+    } 
     else{
         let product;
         let message;
