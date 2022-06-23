@@ -170,8 +170,16 @@ function onchangeProductCart(){
         //Modification de la valeur quantité avec celle du selecteur
         if(product.quantity!=document.getElementsByClassName("itemQuantity")[i].value){
             //Ajout avec modification
-            product.quantity=document.getElementsByClassName("itemQuantity")[i].value;
-            localStorage.setItem(i,JSON.stringify(product));
+            if(document.getElementsByClassName("itemQuantity")[i].value>100){
+                product.quantity=100;
+                localStorage.setItem(i,JSON.stringify(product));
+                console.log("Limite d'ajout dépassé");
+            }
+            else{
+                product.quantity=document.getElementsByClassName("itemQuantity")[i].value;
+                localStorage.setItem(i,JSON.stringify(product));
+            }
+            
             //Animation et Modifie le paragraphe associe
             animationonchangeproductCart(i);
         }
@@ -186,7 +194,9 @@ function animationonchangeproductCart(i){
     //Blocage de l'input
     document.getElementsByClassName("itemQuantity")[i].disabled="disabled";
     window.setTimeout(function (){
-        document.getElementsByClassName("cart__item__content__settings__quantity")[i].firstChild.innerHTML="Qté : "+document.getElementsByClassName("itemQuantity")[i].value;
+        let product = JSON.parse(localStorage.getItem(i));
+        document.getElementsByClassName("itemQuantity")[i].value=product.quantity;
+        document.getElementsByClassName("cart__item__content__settings__quantity")[i].firstChild.innerHTML="Qté : "+product.quantity;
         document.getElementsByClassName("itemQuantity")[i].disabled="";
     },1500);
 }
