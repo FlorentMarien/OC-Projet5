@@ -55,6 +55,7 @@ function changeProduct(){
 function animationaddToCart(i){
     // 0 Article non ajouté // 1 Article déjà enregistré // 2 Limite de 100 // 3 Valeur 0 Ajouté
     let arrayMessage=["Votre article a bien été ajouté","Ajout de la quantité","Article limité à 100 exemplaires","Vous n'avez pas modifié le nombre d'article"]
+    if(i==2 || i==3) document.getElementById("animation__container__notification").style.backgroundColor="darkred";
     document.getElementById("animation__container__notification").firstChild.innerHTML=arrayMessage[i];
     document.getElementById("animation__container__notification").classList.toggle("animation");
     document.getElementById("addToCart").disabled="true";
@@ -155,6 +156,7 @@ function writeArticleCart(apiproduct,product){
                 "</div>"+
                 "</div>"+
             "</article>";
+        
 }
 function addEventCart(){
     document.getElementById("order").addEventListener("click", getFormulaire);
@@ -171,9 +173,13 @@ function onchangeProductCart(){
         //Modification de la valeur quantité avec celle du selecteur
         if(product.quantity!=document.getElementsByClassName("itemQuantity")[i].value){
             //Ajout avec modification
-            if(document.getElementsByClassName("itemQuantity")[i].value==0) deleteProductCartByPos(i);
+            if(document.getElementsByClassName("itemQuantity")[i].value==0){
+                alertOnchangeProductCart(0);
+            }
             else{
-                if(document.getElementsByClassName("itemQuantity")[i].value>100) product.quantity=100;
+                if(document.getElementsByClassName("itemQuantity")[i].value>100){
+                    alertOnchangeProductCart(1);
+                }
                 else product.quantity=document.getElementsByClassName("itemQuantity")[i].value;
                 
                 localStorage.setItem(i,JSON.stringify(product));
@@ -198,25 +204,40 @@ function animationonchangeproductCart(i){
         document.getElementsByClassName("itemQuantity")[i].disabled="";
     },1500);
 }
-function deleteProductCartByPos(pos){
-    refreshStoragePanier(pos);
+function confirmDeleteProductCart() {
+    //Alert pour confirmer suppresion de l'article page panier
+    let text = "Souhaitez vous vraiment supprimer l'article ?";
+    if (confirm(text) == true){
+      return true;
+    } 
+    else{
+      return false;
+    }
+}
+function alertOnchangeProductCart(i) {
+    //Alert // 0= =0 // 1= >100
+    const text = ["La quantité saisie est incorrect","La quantité saisie doit être inférieur à 100"];
+    alert(text[i]);
+
 }
 function deleteProductCart(){
     //Dernier element du tableau Y+1 pour le 0
     //Y = position de l'élement supprimer
-    let y=0;
-    let productHtml={
-        dataId:this.closest("article").attributes["data-id"].value,
-        dataColor:this.closest("article").attributes["data-color"].value
-    }
-    for(i=0;i<localStorage.length;i++){
-        let product = JSON.parse(localStorage.getItem(i));
-        if(product.id==productHtml.dataId && product.color==productHtml.dataColor){
-            y=i;
-            console.log(y);
+    if(confirmDeleteProductCart()==true){
+        let y=0;
+        let productHtml={
+            dataId:this.closest("article").attributes["data-id"].value,
+            dataColor:this.closest("article").attributes["data-color"].value
         }
+        for(i=0;i<localStorage.length;i++){
+            let product = JSON.parse(localStorage.getItem(i));
+            if(product.id==productHtml.dataId && product.color==productHtml.dataColor){
+                y=i;
+                console.log(y);
+            }
+        }
+        refreshStoragePanier(y);
     }
-    refreshStoragePanier(y);
 }
 function refreshStoragePanier(y){
     if(localStorage.length==y+1){
