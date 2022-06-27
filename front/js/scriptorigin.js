@@ -206,13 +206,9 @@ function deleteProductCart(){
     //Y = position de l'élement supprimer
     let y=0;
     let productHtml={
-        dataId:this.parentNode.parentNode.parentNode.parentNode.attributes["data-id"].value,
-        // dataId:this.closest("article").attributes
-        dataColor:this.parentNode.parentNode.parentNode.parentNode.attributes["data-color"].value
+        dataId:this.closest("article").attributes["data-id"].value,
+        dataColor:this.closest("article").attributes["data-color"].value
     }
-
-    console.log(productHtml.dataId);
-    
     for(i=0;i<localStorage.length;i++){
         let product = JSON.parse(localStorage.getItem(i));
         if(product.id==productHtml.dataId && product.color==productHtml.dataColor){
