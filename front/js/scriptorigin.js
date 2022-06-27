@@ -48,30 +48,13 @@ function changeProduct(){
             .getElementById("colors")
             .innerHTML+="<option value=\""+iterator+"\">"+iterator+"</option>";
         }
-        productQuantity();
+        
     });
     clickaddProduct();
 }
-function productQuantity(){
-    let product;
-    let verif=0;
-        for(i=0;i<localStorage.length;i++){
-            product=JSON.parse(localStorage.getItem(i));
-            if(product.id==getIdProductPage() && product.color==document.getElementById("colors").value){
-                document.getElementById("quantity").value=product.quantity;
-                verif++;
-                i=localStorage.length+1;
-            }
-        }
-        if(verif==0){
-            document.getElementById("quantity").value=0;
-        }
-}
 function animationaddToCart(i){
     // 0 Article non ajouté // 1 Article déjà enregistré // 2 Limite de 100 // 3 Valeur 0 Ajouté
-    if(i==2) document.getElementById("quantity").value=100;
-    if(i==3) document.getElementById("quantity").value=1;
-    let arrayMessage=["Votre article a bien été ajouté","Modification de la quantité","Article limité à 100 exemplaires","Vous n'avez pas modifié le nombre d'article"]
+    let arrayMessage=["Votre article a bien été ajouté","Ajout de la quantité","Article limité à 100 exemplaires","Vous n'avez pas modifié le nombre d'article"]
     document.getElementById("animation__container__notification").firstChild.innerHTML=arrayMessage[i];
     document.getElementById("animation__container__notification").classList.toggle("animation");
     document.getElementById("addToCart").disabled="true";
@@ -84,24 +67,33 @@ function animationaddToCart(i){
 }
 function addToCart(){
 
-//animationaddToCart();
 let id=getIdProductPage();
 let color=document.getElementById("colors").value;
 let quantity=document.getElementById("quantity").value;
 let productClient={'id':id,'color':color,'quantity':quantity};
 let productStorage;
 let verif=0;
-    if(quantity==0) animationaddToCart(3);
-    if(quantity>100) animationaddToCart(2);
-    if(quantity>0 && quantity<=100){      
+    if(productClient.quantity==0) animationaddToCart(3);
+    if(productClient.quantity>0 && quantity<=100){      
         for(i=0;i<localStorage.length;i++){
             productStorage=localStorage.getItem(i);
             productStorage=JSON.parse(productStorage);
             if(productClient.id==productStorage.id && productClient.color==productStorage.color){
-                localStorage.setItem(i,JSON.stringify(productClient));
-                i=localStorage.length+1;
+                //Si quantity saisie par l'utilisateur + quantity déjà enregistré > 100
+                if(parseInt(productStorage.quantity)+parseInt(productClient.quantity)>100){
+                    productClient.quantity=100;
+                    localStorage.setItem(i,JSON.stringify(productClient));
+                    i=localStorage.length+1;
+                    animationaddToCart(2);
+                }
+                //Sinon ajoute normalement
+                else{
+                    productClient.quantity=parseInt(productStorage.quantity)+parseInt(productClient.quantity);
+                    localStorage.setItem(i,JSON.stringify(productClient));
+                    i=localStorage.length+1;
+                    animationaddToCart(1);
+                }
                 verif++;
-                animationaddToCart(1)
             }
         }
         if(verif==0){
@@ -112,7 +104,6 @@ let verif=0;
 }
 function clickaddProduct(){
     document.getElementById("addToCart").addEventListener("click",addToCart);
-    document.getElementById("colors").addEventListener("change",productQuantity);
 }
 //
 // Cart
@@ -216,6 +207,7 @@ function deleteProductCart(){
     let y=0;
     let productHtml={
         dataId:this.parentNode.parentNode.parentNode.parentNode.attributes["data-id"].value,
+        // dataId:this.closest("article").attributes
         dataColor:this.parentNode.parentNode.parentNode.parentNode.attributes["data-color"].value
     }
 
@@ -315,31 +307,35 @@ function getFormulaire(e){
 }
 function verifformulaire(arrayFormulaire){
     let verif=1;
-    if(/[^A-Za-z]/.test(arrayFormulaire.firstName)){
+    if(/[^a-zA-ZÀ-ÿ -"']/.test(arrayFormulaire.firstName) || arrayFormulaire.firstName==""){
         document.getElementById("firstNameErrorMsg").innerHTML="Problème avec la saisie de votre Nom";
         verif++;
     }
     else{
         document.getElementById("firstNameErrorMsg").innerHTML="";   
     }
-    if(/[^A-Za-z]/.test(arrayFormulaire.lastName)){
+    if(/[^a-zA-ZÀ-ÿ -"']/.test(arrayFormulaire.lastName) || arrayFormulaire.lastName==""){
         document.getElementById("lastNameErrorMsg").innerHTML="Problème avec la saisie de votre Prenom";
         verif++;
     }
     else{
         document.getElementById("lastNameErrorMsg").innerHTML="";
     }
-    /*if(/[^A-Za-z]/.test(arrayFormulaire.address)){
-        
-    }*/
-    if(/[^A-Za-z]/.test(arrayFormulaire.city)){
+    if(arrayFormulaire.address==""){
+        document.getElementById("addressErrorMsg").innerHTML="Problème avec la saisie de votre adresse";
+        verif++;
+    }
+    else{
+        document.getElementById("addressErrorMsg").innerHTML="";
+    }
+    if(/[^A-Za-zÀ-ÿ -"']/.test(arrayFormulaire.city)|| arrayFormulaire.city==""){
         document.getElementById("cityErrorMsg").innerHTML="Problème avec la saisie de votre ville";
         verif++;
     }
     else{
         document.getElementById("cityErrorMsg").innerHTML="";
     }
-    if(!/[@]/.test(arrayFormulaire.email)){
+    if(!/[@]/.test(arrayFormulaire.email) || arrayFormulaire.email==""){
         document.getElementById("emailErrorMsg").innerHTML="Problème avec la saisie de votre adresse mail";
         verif++;
     }
