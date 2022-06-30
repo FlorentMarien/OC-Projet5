@@ -150,17 +150,18 @@ function writeArticleCart(apiproduct,product){
                 "</div>"+
                 "<div class=\"cart__item__content\">"+
                     "<div class=\"cart__item__content__description\">"+
-                    "<h2>"+apiproduct.name+"</h2>"+
-                    "<p>"+product.color+"</p>"+
-                    "<p>"+apiproduct.price+" €</p>"+
-                "</div>"+
-                "<div class=\"cart__item__content__settings\">"+
-                    "<div class=\"cart__item__content__settings__quantity\">"+
-                        "<p>Qté : "+product.quantity+"</p>"+
-                        "<input type=\"number\" class=\"itemQuantity\" name=\"itemQuantity\" min=\"1\" max=\"100\" value=\""+product.quantity+"\">"+
+                        "<h2>"+apiproduct.name+"</h2>"+
+                        "<p>"+product.color+"</p>"+
+                        "<p>"+apiproduct.price+" €</p>"+
                     "</div>"+
-                    "<div class=\"cart__item__content__settings__delete\">"+
-                      "<p class=\"deleteItem\">Supprimer</p>"+
+                    "<div class=\"cart__item__content__settings\">"+
+                        "<div class=\"cart__item__content__settings__quantity\">"+
+                            "<p>Qté : "+product.quantity+"</p>"+
+                            "<input type=\"number\" class=\"itemQuantity\" name=\"itemQuantity\" min=\"1\" max=\"100\" value=\""+product.quantity+"\">"+
+                        "</div>"+
+                        "<div class=\"cart__item__content__settings__delete\">"+
+                        "<p class=\"deleteItem\">Supprimer</p>"+
+                        "</div>"+
                     "</div>"+
                 "</div>"+
             "</article>";
@@ -230,6 +231,7 @@ function writeArticleCart(apiproduct,product){
     document.getElementById("cart__items").appendChild(article);
 }
 function addEventCart(){
+    //Ajout event bouton commander, supprimer, selecteur quantité
     document.getElementById("order").addEventListener("click", getFormulaire);
     for(i=0;i<localStorage.length;i++){
         document.getElementsByClassName("itemQuantity")[i].addEventListener("change", onchangeProductCart);
@@ -239,27 +241,32 @@ function addEventCart(){
 function onchangeProductCart(){
     //Recuperation de l'item du stockage
     let i=0;
+    let productHtml=getDataIdDataColor(this);
     for(i=0;i<localStorage.length;i++){
         let product = JSON.parse(localStorage.getItem(i));
+        if(productHtml.dataId==product.id && productHtml.dataColor==product.color){
         //Modification de la valeur quantité avec celle du selecteur
-        if(product.quantity!=document.getElementsByClassName("itemQuantity")[i].value){
-            //Ajout avec modification
-            if(document.getElementsByClassName("itemQuantity")[i].value==0){
-                alertOnchangeProductCart(0);
-            }
-            else{
-                if(document.getElementsByClassName("itemQuantity")[i].value>100){
-                    alertOnchangeProductCart(1);
+            if(product.quantity!=document.getElementsByClassName("itemQuantity")[i].value){
+                //Ajout avec modification
+                if(document.getElementsByClassName("itemQuantity")[i].value==0){
+                    alertOnchangeProductCart(0);
                 }
-                else product.quantity=document.getElementsByClassName("itemQuantity")[i].value;
-                
-                localStorage.setItem(i,JSON.stringify(product));
-                //Animation et Modifie le paragraphe associe
-                animationonchangeproductCart(i);
+                else{
+                    if(document.getElementsByClassName("itemQuantity")[i].value>100){
+                        alertOnchangeProductCart(1);
+                    }
+                    else{
+                        product.quantity=document.getElementsByClassName("itemQuantity")[i].value;
+                        localStorage.setItem(i,JSON.stringify(product));
+                        //Animation et Modifie le paragraphe associe
+                        animationonchangeproductCart(i);
+                        refreshPanier();
+                    }
+                }
             }
         }
     }
-    refreshPanier();
+    
 }
 function animationonchangeproductCart(i){
     //Ajout du logo de chargement
@@ -296,10 +303,7 @@ function deleteProductCart(){
     //Y = position de l'élement supprimer
     if(confirmDeleteProductCart()==true){
         let y=0;
-        let productHtml={
-            dataId:this.closest("article").attributes["data-id"].value,
-            dataColor:this.closest("article").attributes["data-color"].value
-        }
+        let productHtml=getDataIdDataColor(this);
         for(i=0;i<localStorage.length;i++){
             let product = JSON.parse(localStorage.getItem(i));
             if(product.id==productHtml.dataId && product.color==productHtml.dataColor){
@@ -309,6 +313,14 @@ function deleteProductCart(){
         }
         refreshStoragePanier(y);
     }
+}
+function getDataIdDataColor(elt){
+    //Return data id - data color / For onchange and delete
+    let productHtml={
+        dataId:elt.closest("article").attributes["data-id"].value,
+        dataColor:elt.closest("article").attributes["data-color"].value
+    }
+    return productHtml;
 }
 function refreshStoragePanier(y){
     if(localStorage.length==y+1){
