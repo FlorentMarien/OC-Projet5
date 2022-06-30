@@ -142,6 +142,7 @@ async function getCart(){
     refreshPanier();
 }
 function writeArticleCart(apiproduct,product){
+    /*
     document.getElementById("cart__items").innerHTML+=
             "<article class=\"cart__item\" data-id=\""+product.id+"\" data-color=\""+product.color+"\">"+
                 "<div class=\"cart__item__img\">"+
@@ -156,15 +157,77 @@ function writeArticleCart(apiproduct,product){
                 "<div class=\"cart__item__content__settings\">"+
                     "<div class=\"cart__item__content__settings__quantity\">"+
                         "<p>Qté : "+product.quantity+"</p>"+
-                      "<input type=\"number\" class=\"itemQuantity\" name=\"itemQuantity\" min=\"1\" max=\"100\" value=\""+product.quantity+"\">"+
+                        "<input type=\"number\" class=\"itemQuantity\" name=\"itemQuantity\" min=\"1\" max=\"100\" value=\""+product.quantity+"\">"+
                     "</div>"+
                     "<div class=\"cart__item__content__settings__delete\">"+
                       "<p class=\"deleteItem\">Supprimer</p>"+
                     "</div>"+
                 "</div>"+
-                "</div>"+
             "</article>";
-        
+    */
+    //Article
+    let article=document.createElement("article");
+    article.className="cart__item";
+    article.setAttribute("data-id",product.id);
+    article.setAttribute("data-color",product.color);
+        //Div cart__item__img
+        let article_div1=document.createElement("div");
+        article_div1.className="cart__item__img";
+        let article_div1_img=document.createElement("img");
+        article_div1_img.src=apiproduct.imageUrl;
+        article_div1_img.altTxt=apiproduct.altTxt;
+        article_div1.appendChild(article_div1_img);
+
+        //Div cart__item__content
+        let article_div2=document.createElement("div");
+        article_div2.className="cart__item__content";
+            let article_div2_div1=document.createElement("div");
+            article_div2_div1.className="cart__item__content__description";
+                let article_div2_div1_h2=document.createElement("h2");
+                article_div2_div1_h2.textContent=apiproduct.name;
+                let article_div2_div1_p1=document.createElement("p");
+                article_div2_div1_p1.textContent=product.color;
+                let article_div2_div1_p2=document.createElement("p");
+                article_div2_div1_p2.textContent=apiproduct.price+" €";
+            article_div2_div1.appendChild(article_div2_div1_h2);
+            article_div2_div1.appendChild(article_div2_div1_p1);
+            article_div2_div1.appendChild(article_div2_div1_p2);
+
+            //Div cart__item__content__settings
+            let article_div2_div2=document.createElement("div");
+            article_div2_div2.className="cart__item__content__settings";
+                let article_div2_div2_div1 = document.createElement("div");
+                article_div2_div2_div1.className="cart__item__content__settings__quantity";
+                    let article_div2_div2_div1_p = document.createElement("p");
+                    article_div2_div2_div1_p.textContent="Qté : "+product.quantity;
+                    
+                    let article_div2_div2_div1_input = document.createElement("input");
+                    article_div2_div2_div1_input.type="number";
+                    article_div2_div2_div1_input.className="itemQuantity";
+                    article_div2_div2_div1_input.name="itemQuantity";
+                    article_div2_div2_div1_input.min="1";
+                    article_div2_div2_div1_input.max="100";
+                    article_div2_div2_div1_input.value=product.quantity;
+                    
+                article_div2_div2_div1.appendChild(article_div2_div2_div1_p);
+                article_div2_div2_div1.appendChild(article_div2_div2_div1_input);
+                
+                let article_div2_div2_div2 = document.createElement("div");
+                article_div2_div2_div2.className="cart__item__content__settings__delete";
+                    let article_div2_div2_div2_p = document.createElement("p");
+                    article_div2_div2_div2_p.className="deleteItem";
+                    article_div2_div2_div2_p.textContent="Supprimer";
+                article_div2_div2_div2.appendChild(article_div2_div2_div2_p);
+            article_div2_div2.appendChild(article_div2_div2_div1);
+            article_div2_div2.appendChild(article_div2_div2_div2);
+            
+        article_div2.appendChild(article_div2_div1);
+        article_div2.appendChild(article_div2_div2);
+          
+    article.appendChild(article_div1);
+    article.appendChild(article_div2);
+    
+    document.getElementById("cart__items").appendChild(article);
 }
 function addEventCart(){
     document.getElementById("order").addEventListener("click", getFormulaire);
@@ -305,8 +368,8 @@ function animationPrixQuantityPanier(allQuantity,allPrice){
     document.getElementById("totalPrice").firstChild.classList.toggle("animationchangequantity");
     
     window.setTimeout(function (){
-        document.getElementById("totalQuantity").innerHTML=allQuantity;
-        document.getElementById("totalPrice").innerHTML=allPrice;
+        document.getElementById("totalQuantity").textContent=allQuantity;
+        document.getElementById("totalPrice").textContent=allPrice;
     },1500);
 }
 function getFormulaire(e){
@@ -333,39 +396,39 @@ function getFormulaire(e){
 function verifformulaire(arrayFormulaire){
     let verif=1;
     if(/[^a-zA-ZÀ-ÿ -"']/.test(arrayFormulaire.firstName) || arrayFormulaire.firstName==""){
-        document.getElementById("firstNameErrorMsg").innerHTML="Problème avec la saisie de votre Nom";
+        document.getElementById("firstNameErrorMsg").textContent="Problème avec la saisie de votre Nom";
         verif++;
     }
     else{
-        document.getElementById("firstNameErrorMsg").innerHTML="";   
+        document.getElementById("firstNameErrorMsg").textContent="";   
     }
     if(/[^a-zA-ZÀ-ÿ -"']/.test(arrayFormulaire.lastName) || arrayFormulaire.lastName==""){
-        document.getElementById("lastNameErrorMsg").innerHTML="Problème avec la saisie de votre Prenom";
+        document.getElementById("lastNameErrorMsg").textContent="Problème avec la saisie de votre Prenom";
         verif++;
     }
     else{
-        document.getElementById("lastNameErrorMsg").innerHTML="";
+        document.getElementById("lastNameErrorMsg").textContent="";
     }
     if(arrayFormulaire.address==""){
-        document.getElementById("addressErrorMsg").innerHTML="Problème avec la saisie de votre adresse";
+        document.getElementById("addressErrorMsg").textContent="Problème avec la saisie de votre adresse";
         verif++;
     }
     else{
-        document.getElementById("addressErrorMsg").innerHTML="";
+        document.getElementById("addressErrorMsg").textContent="";
     }
     if(/[^A-Za-zÀ-ÿ -"']/.test(arrayFormulaire.city)|| arrayFormulaire.city==""){
-        document.getElementById("cityErrorMsg").innerHTML="Problème avec la saisie de votre ville";
+        document.getElementById("cityErrorMsg").textContent="Problème avec la saisie de votre ville";
         verif++;
     }
     else{
-        document.getElementById("cityErrorMsg").innerHTML="";
+        document.getElementById("cityErrorMsg").textContent="";
     }
     if(!/[@]/.test(arrayFormulaire.email) || arrayFormulaire.email==""){
-        document.getElementById("emailErrorMsg").innerHTML="Problème avec la saisie de votre adresse mail";
+        document.getElementById("emailErrorMsg").textContent="Problème avec la saisie de votre adresse mail";
         verif++;
     }
     else{
-        document.getElementById("emailErrorMsg").innerHTML="";
+        document.getElementById("emailErrorMsg").textContent="";
     }
     return verif;
     
