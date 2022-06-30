@@ -1,9 +1,12 @@
 // Product
 function getIdProductPage(){
-    let id = window.location.search;
+    const id = window.location.search;
     // slice retire 4 premiers caractère
+    // URL?id=415b7cacb65d43b2b5c1ff70f3393ad1
     return id.slice(4);
 }
+
+
 async function getProductById(id){
     return await fetch("http://localhost:3000/api/products/"+id)
     .then(function(res) {
@@ -19,8 +22,6 @@ async function getProductById(id){
     });
 }
 function changeProduct(){
-//Verification si l'id n'est pas déjà enregistré
-
     getProductById(getIdProductPage()).then((result) => {                     
         //Ajout de l'image
         document
@@ -48,15 +49,15 @@ function changeProduct(){
             .getElementById("colors")
             .innerHTML+="<option value=\""+iterator+"\">"+iterator+"</option>";
         }
-        
     });
     clickaddProduct();
 }
-function animationaddToCart(i){
-    // 0 Article non ajouté // 1 Article déjà enregistré // 2 Limite de 100 // 3 Valeur 0 Ajouté
-    let arrayMessage=["Votre article a bien été ajouté","Ajout de la quantité","Article limité à 100 exemplaires","Vous n'avez pas modifié le nombre d'article"]
-    if(i==2 || i==3) document.getElementById("animation__container__notification").style.backgroundColor="darkred";
-    document.getElementById("animation__container__notification").firstChild.innerHTML=arrayMessage[i];
+function animationaddToCart(msg,i){
+    // i=0 Message Bleu // i=1 Message Rouge
+    if(i==0) document.getElementById("animation__container__notification").style.backgroundColor="#2c3e50";
+    else if(i==1) document.getElementById("animation__container__notification").style.backgroundColor="darkred";
+    
+    document.getElementById("animation__container__notification").firstChild.innerHTML=msg;
     document.getElementById("animation__container__notification").classList.toggle("animation");
     document.getElementById("addToCart").disabled="true";
     document.getElementById("addToCart").style.opacity="0.7";
@@ -67,39 +68,43 @@ function animationaddToCart(i){
     } , 3000);
 }
 function addToCart(){
-
-let id=getIdProductPage();
-let color=document.getElementById("colors").value;
-let quantity=document.getElementById("quantity").value;
-let productClient={'id':id,'color':color,'quantity':quantity};
+let productClient={
+    'id':getIdProductPage(),
+    'color':document.getElementById("colors").value,
+    'quantity':document.getElementById("quantity").value
+};
 let productStorage;
 let verif=0;
-    if(productClient.quantity==0) animationaddToCart(3);
-    if(productClient.quantity>0 && quantity<=100){      
+    //Verification de la quantité saisie par l'utilisateur
+    if(productClient.quantity==0) animationaddToCart("La quantité saisie est invalide",1);
+    if(productClient.quantity>100) animationaddToCart("La quantité saisie est supérieur à 100",1);
+    if(productClient.quantity>0 && productClient.quantity<=100){
+        // Test pour voir si l'élément est déjà enregistré   
         for(i=0;i<localStorage.length;i++){
             productStorage=localStorage.getItem(i);
             productStorage=JSON.parse(productStorage);
             if(productClient.id==productStorage.id && productClient.color==productStorage.color){
                 //Si quantity saisie par l'utilisateur + quantity déjà enregistré > 100
-                if(parseInt(productStorage.quantity)+parseInt(productClient.quantity)>100){
+                if((parseInt(productStorage.quantity)+parseInt(productClient.quantity))>100){
                     productClient.quantity=100;
                     localStorage.setItem(i,JSON.stringify(productClient));
                     i=localStorage.length+1;
-                    animationaddToCart(2);
+                    animationaddToCart("Article limité à 100 exemplaires",1);
                 }
                 //Sinon ajoute normalement
                 else{
                     productClient.quantity=parseInt(productStorage.quantity)+parseInt(productClient.quantity);
                     localStorage.setItem(i,JSON.stringify(productClient));
                     i=localStorage.length+1;
-                    animationaddToCart(1);
+                    animationaddToCart("Ajout de la quantité",0);
                 }
                 verif++;
             }
         }
+        //Si verif == 0 = non detecter dans le stockage
         if(verif==0){
             localStorage.setItem(localStorage.length,JSON.stringify(productClient));
-            animationaddToCart(0);
+            animationaddToCart("Votre article a bien été ajouté",0);
         }
     }
 }
