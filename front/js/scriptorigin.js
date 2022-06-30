@@ -22,32 +22,35 @@ async function getProductById(id){
     });
 }
 function changeProduct(){
+    // Ajout du produit, page product
     getProductById(getIdProductPage()).then((result) => {                     
         //Ajout de l'image
-        document
-        .getElementsByClassName("item__img")[0]
-        .innerHTML="<img src=\""+result.imageUrl+"\" alt=\""+result.altTxt+"\">";
+        let img = document.createElement("img");
+        img.src= result.imageUrl;
+        img.alt= result.altTxt;
+        document.getElementsByClassName("item__img")[0].appendChild(img);
         //Titre
         document
         .getElementById("title")
-        .innerHTML=result.name;
+        .textContent=result.name;
         //Prix
         document
         .getElementById("price")
-        .innerHTML=result.price;
+        .textContent=result.price;
         //Description
         document
         .getElementById("description")
-        .innerHTML=result.description;
-        //Select color
+        .textContent=result.description;
         //Reset color
         document
         .getElementById("colors")
         .innerHTML="";
+        //Ajout select color
         for (const iterator of result.colors) {
-            document
-            .getElementById("colors")
-            .innerHTML+="<option value=\""+iterator+"\">"+iterator+"</option>";
+            let color = document.createElement("option");
+            color.value=iterator;
+            color.textContent=iterator;
+            document.getElementById("colors").appendChild(color);
         }
     });
     clickaddProduct();
