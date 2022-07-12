@@ -1,25 +1,11 @@
 initPanier();
 async function initPanier(){
     let product;
-    let stockageapiproduct=[];
-    
-    // addProductCart(product.id,product,i);
     for (i=0 ; i<localStorage.length ;i++){
-        let verif=0;
         product=JSON.parse(localStorage.getItem(i));
-        for(y=0 ; y<stockageapiproduct.length;y++){
-            if(stockageapiproduct[y]._id==product.id){
-                writeArticleCart(stockageapiproduct[y],product);
-                verif++;
-                y=stockageapiproduct.length;
-            }
-        }
-        if(verif==0){
-            await getProductById(product.id).then((apiproduct) => {
-                stockageapiproduct.push(apiproduct);
-                writeArticleCart(apiproduct,product); 
-            });
-        }  
+        await getProductById(product.id).then((apiproduct) => {
+            writeArticleCart(apiproduct,product); 
+        });
     }
     addEventListenerPanier();
     refreshPanier();
